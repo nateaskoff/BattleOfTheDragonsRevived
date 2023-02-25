@@ -12,17 +12,14 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: ${{ var.AWS_REGION }}
   AWS_ROLE_NAME: ${{ secrets.AWS_ROLE_NAME }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-  TF_VERSION: ${{ var.TF_VERSION }}
   TF_TOKEN: ${{ secrets.TF_TOKEN }}
-  TG_VERSION: ${{ var.TG_VERSION }}
   TG_TF_REGISTRY_TOKEN: ${{ secrets.TF_TOKEN }}
-  NW_MODULE_NAME: ${{ secrets.NW_MODULE_NAME }}
-  DM_PW: ${{ secrets.NW_DM_PW }}
-  ADMIN_PW: ${{ secrets.NW_ADMIN_PW }}
+  NW_MODULE_NAME: ${{ vars.NW_MODULE_NAME }}
+  NW_DM_PW: ${{ secrets.NW_DM_PW }}
+  NW_ADMIN_PW: ${{ secrets.NW_ADMIN_PW }}
 
 jobs:
   job-dev-tf-plan:
@@ -30,27 +27,29 @@ jobs:
     environment: DEV
     env:
       AWS_ENV: DEV
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VERSION: ${{ vars.TF_VERSION }}
+      TG_VERSION: ${{ vars.TG_VERSION }}
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install curl wget zip unzip -y
       - name: Install Infracost
         run: curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -58,7 +57,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -66,12 +65,12 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Infracost and Terragrunt plan
         working-directory: infra
@@ -85,26 +84,28 @@ jobs:
     env:
       AWS_ENV: DEV
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VERSION: ${{ vars.TF_VERSION }}
+      TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-dev-tf-plan
     if: needs.job-dev-tf-plan.result == 'success'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -112,7 +113,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -120,12 +121,12 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
@@ -135,26 +136,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEV
     needs: job-dev-tf-apply
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
     if: needs.job-dev-tf-apply.result == 'success'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install awscli -y
       - name: Configure AWS credentials
         run: |
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://dev-botdr-s3-code-bucket/Ansible/ --recursive
@@ -165,28 +167,30 @@ jobs:
     env:
       AWS_ENV: PROD
       NW_SERVER_NAME: 'Battle Of The Dragons Revived'
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VERSION: ${{ vars.TF_VERSION }}
+      TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-dev-code-deploy
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install curl wget zip unzip -y
       - name: Install Infracost
         run: curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -194,7 +198,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -202,12 +206,12 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Infracost and Terragrunt plan
         working-directory: infra
@@ -221,26 +225,28 @@ jobs:
     env:
       AWS_ENV: PROD
       NW_SERVER_NAME: 'Battle Of The Dragons Revived'
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VERSION: ${{ vars.TF_VERSION }}
+      TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-prod-tf-plan
     if: needs.job-prod-tf-plan.result == 'success'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -248,7 +254,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -256,12 +262,12 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
@@ -271,26 +277,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: PROD
     needs: job-prod-tf-apply
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
     if: needs.job-prod-tf-apply.result == 'success'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install awscli -y
       - name: Configure AWS credentials
         run: |
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://prod-botdr-s3-code-bucket/Ansible/ --recursive
@@ -300,24 +307,29 @@ jobs:
     environment: DEV
     env:
       AWS_ENV: DEV
+      NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VERSION: ${{ vars.TF_VERSION }}
+      TG_VERSION: ${{ vars.TG_VERSION }}
+    needs: job-prod-code-deploy
+    if: needs.job-prod-code-deploy.result == 'success'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@2
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -325,7 +337,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -333,12 +345,12 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
