@@ -12,13 +12,13 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: ${{ var.AWS_REGION }}
+  AWS_REGION: ${{ $AWS_REGION }}
   AWS_ROLE_NAME: ${{ secrets.AWS_ROLE_NAME }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-  TF_VERSION: ${{ var.TF_VERSION }}
+  TF_VERSION: ${{ $TF_VERSION }}
   TF_TOKEN: ${{ secrets.TF_TOKEN }}
-  TG_VERSION: ${{ var.TG_VERSION }}
+  TG_VERSION: ${{ $TG_VERSION }}
   TG_TF_REGISTRY_TOKEN: ${{ secrets.TF_TOKEN }}
   NW_MODULE_NAME: ${{ secrets.NW_MODULE_NAME }}
   DM_PW: ${{ secrets.NW_DM_PW }}
@@ -300,6 +300,8 @@ jobs:
     environment: DEV
     env:
       AWS_ENV: DEV
+    needs: job-prod-code-deploy
+    if: needs.job-prod-code-deploy.result == 'success'
     steps:
       - name: Checkout Code
         uses: actions/checkout@2
