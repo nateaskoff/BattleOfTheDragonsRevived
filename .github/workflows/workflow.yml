@@ -12,13 +12,10 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: ${{ env.AWS_REGION }}
   AWS_ROLE_NAME: ${{ secrets.AWS_ROLE_NAME }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-  TF_VERSION: ${{ env.TF_VERSION }}
   TF_TOKEN: ${{ secrets.TF_TOKEN }}
-  TG_VERSION: ${{ env.TG_VERSION }}
   TG_TF_REGISTRY_TOKEN: ${{ secrets.TF_TOKEN }}
   NW_MODULE_NAME: ${{ secrets.NW_MODULE_NAME }}
   DM_PW: ${{ secrets.NW_DM_PW }}
@@ -30,6 +27,9 @@ jobs:
     environment: DEV
     env:
       AWS_ENV: DEV
+      AWS_REGION: ${{ env.AWS_REGION }}
+      TF_VERSION: ${{ env.TF_VERSION }}
+      TG_VERSION: ${{ env.TG_VERSION }}
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
     steps:
       - name: Checkout Code
@@ -85,6 +85,9 @@ jobs:
     env:
       AWS_ENV: DEV
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
+      AWS_REGION: ${{ env.AWS_REGION }}
+      TF_VERSION: ${{ env.TF_VERSION }}
+      TG_VERSION: ${{ env.TG_VERSION }}
     needs: job-dev-tf-plan
     if: needs.job-dev-tf-plan.result == 'success'
     steps:
@@ -135,6 +138,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEV
     needs: job-dev-tf-apply
+    env:
+      AWS_REGION: ${{ env.AWS_REGION }}
     if: needs.job-dev-tf-apply.result == 'success'
     steps:
       - name: Checkout Code
@@ -165,6 +170,9 @@ jobs:
     env:
       AWS_ENV: PROD
       NW_SERVER_NAME: 'Battle Of The Dragons Revived'
+      AWS_REGION: ${{ env.AWS_REGION }}
+      TF_VERSION: ${{ env.TF_VERSION }}
+      TG_VERSION: ${{ env.TG_VERSION }}
     needs: job-dev-code-deploy
     if: github.ref == 'refs/heads/main'
     steps:
@@ -221,6 +229,9 @@ jobs:
     env:
       AWS_ENV: PROD
       NW_SERVER_NAME: 'Battle Of The Dragons Revived'
+      AWS_REGION: ${{ env.AWS_REGION }}
+      TF_VERSION: ${{ env.TF_VERSION }}
+      TG_VERSION: ${{ env.TG_VERSION }}
     needs: job-prod-tf-plan
     if: needs.job-prod-tf-plan.result == 'success'
     steps:
@@ -271,6 +282,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: PROD
     needs: job-prod-tf-apply
+    env:
+      AWS_REGION: ${{ env.AWS_REGION }}
     if: needs.job-prod-tf-apply.result == 'success'
     steps:
       - name: Checkout Code
@@ -300,6 +313,10 @@ jobs:
     environment: DEV
     env:
       AWS_ENV: DEV
+      NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
+      AWS_REGION: ${{ env.AWS_REGION }}
+      TF_VERSION: ${{ env.TF_VERSION }}
+      TG_VERSION: ${{ env.TG_VERSION }}
     needs: job-prod-code-deploy
     if: needs.job-prod-code-deploy.result == 'success'
     steps:
