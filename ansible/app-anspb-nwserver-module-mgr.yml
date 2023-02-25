@@ -1,0 +1,42 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Check nwserver binary
+    stat:
+      path: /nwserver/bin/linux-x86/nwserver-linux
+    become: yes
+    become_user: nwserver-user
+    register: nwserver_binary
+
+  - name: Check .local nwn mod
+    stat:
+      path: '~/.local/share/Neverwinter Nights/modules/Battle Of The Dragons Revived.mod'
+    become: yes
+    become_user: nwserver-user
+    register: local_mod
+
+  - name: If no module, get module from S3
+    amazon.aws.s3_object:
+      bucket: '{{ AWS_ENV }}-botdr-s3-mod-bucket'
+      object: 'Battle Of The Dragons Revived.mod'
+      dest: '~/.local/share/Neverwinter Nights/modules/Battle Of The Dragons Revived.mod'
+      mode: get
+      overwrite: different
+    become: yes
+    become_user: nwserver-user
+    when: local_mod.stat.exists == false
+    register: nw_module
+
+  - name: Check nwserver-service PID exists
+    command: ps aux | grep '[n]wserver-service' | aws '{print$2}'
+    register: nwserver_service
+    ignore_errors: true
+
+  - name: Set nwserver PID
+    set_fact:
+      nwserver_service: "{{ nwserver_service.stdout }}"
+    when: nwserver_service.rc == 0
+
+#  - name: Notify module of restart
+#    command: ""
+#    when: nw_module.changed
