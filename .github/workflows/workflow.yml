@@ -17,9 +17,9 @@ env:
   INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
   TF_TOKEN: ${{ secrets.TF_TOKEN }}
   TG_TF_REGISTRY_TOKEN: ${{ secrets.TF_TOKEN }}
-  NW_MODULE_NAME: ${{ secrets.NW_MODULE_NAME }}
-  DM_PW: ${{ secrets.NW_DM_PW }}
-  ADMIN_PW: ${{ secrets.NW_ADMIN_PW }}
+  NW_MODULE_NAME: ${{ vars.NW_MODULE_NAME }}
+  NW_DM_PW: ${{ secrets.NW_DM_PW }}
+  NW_ADMIN_PW: ${{ secrets.NW_ADMIN_PW }}
 
 jobs:
   job-dev-tf-plan:
