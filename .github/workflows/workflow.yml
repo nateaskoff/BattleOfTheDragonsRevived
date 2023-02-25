@@ -43,14 +43,14 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -66,8 +66,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -100,14 +100,14 @@ jobs:
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -123,8 +123,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -154,8 +154,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -187,14 +187,14 @@ jobs:
         run: curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -202,7 +202,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${ secrets.TF_TOKEN }"
           }
           EOF
       - name: Configure AWS credentials
@@ -210,8 +210,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -244,14 +244,14 @@ jobs:
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -259,7 +259,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${ secrets.TF_TOKEN }"
           }
           EOF
       - name: Configure AWS credentials
@@ -267,8 +267,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -298,8 +298,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
@@ -329,14 +329,14 @@ jobs:
           sudo apt-get install curl wget zip unzip -y
       - name: Install Terraform
         run: |
-          wget https://releases.hashicorp.com/terraform/${{ env.TF_VERSION }}/terraform_${{ env.TF_VERSION }}_linux_amd64.zip
-          unzip terraform_${{ env.TF_VERSION }}_linux_amd64.zip
+          wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
+          unzip terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
           chmod +x terraform
           sudo mv terraform /usr/local/bin
           terraform --version
       - name: Install Terragrunt
         run: |
-          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ env.TG_VERSION }}/terragrunt_linux_amd64
+          wget https://github.com/gruntwork-io/terragrunt/releases/download/v${{ vars.TG_VERSION }}/terragrunt_linux_amd64
           chmod +x terragrunt_linux_amd64
           sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
           terragrunt --version
@@ -344,7 +344,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${ secrets.TF_TOKEN }"
           }
           EOF
       - name: Configure AWS credentials
@@ -352,8 +352,8 @@ jobs:
           mkdir ~/.aws
           cat <<EOF >> ~/.aws/credentials
           [default]
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
