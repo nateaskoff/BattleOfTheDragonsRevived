@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Check .local exists
+    stat:
+      path: ~/.local
+    become: yes
+    become_user: nwserver-user
+    register: nwserver_user_local
+
+  - name: Nwserver first run
+    shell: ./nwserver-linux
+    args:
+      chdir: /nwserver/bin/linux-x86
+      executable: /bin/bash
+    ignore_errors: true
+    become: yes
+    become_user: nwserver-user
+    when: nwserver_user_local.stat.exists == false

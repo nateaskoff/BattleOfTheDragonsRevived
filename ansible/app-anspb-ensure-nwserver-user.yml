@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Ensure nwserver-group
+    group:
+      name: nwserver-group
+      state: present
+
+  - name: Ensure nwserver-user
+    user:
+      name: nwserver-user
+      group: nwserver-group
+      state: present
+      createhome: yes
+      shell: /bin/bash

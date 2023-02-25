@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Check nwserver-linux binary exists
+    stat:
+      path: /nwserver/bin/linux-x86/nwserver-linux
+    register: nwserver_binary_exists
+
+  - name: Check live module exists
+    stat:
+      path: '~/.local/share/Neverwinter Nights/modules/Battle Of The Dragons Revived.mod'
+    become: yes
+    become_user: nwserver-user
+    register: live_module_exists
+
+  - name: Set nwserver inputs
+    set_fact:
+      NW_MODULE_NAME: "{{ NW_MODULE_NAME }}"
+      NW_SERVER_NAME: "{{ NW_SERVER_NAME }}"
+      NW_DM_PW: "{{ lookup('aws_ssm', '{{ AWS_ENV }}-sec-dm-pw', region='us-east-1') }}"
+      NW_ADMIN_PW: "{{ lookup('aws_ssm', '{{ AWS_ENV }}-sec-admin-pw', region='us-east-1') }}"
+      NW_MAX_CLIENTS: 32
+      NW_MIN_LEVEL: 1
+      NW_MAX_LEVEL: 40
+      NW_PAUSE_ALLOWED: 0
+      NW_PVP: 1
+      NW_SERVER_VAULT: 0
+      NW_ENFORCE_ILVL_RESTRICTIONS: 1
+      NW_ENFORCE_LEGAL_CHARS: 1
+      NW_GAME_TYPE: 0
+      NW_ONE_PARTY: 0
+      NW_DIFFICULTY_LEVEL: 3
+      NW_PUBLIC_SERVER: 1
+      NW_RELOAD_WHEN_EMPTY: 0
+      NW_PORT: 5121
+    no_log: true
+
+  - name: nwserver-linux pid
+    shell: pidof nwserver-linux
+    register: nwserver_pid
+    ignore_errors: true
+
+  - name: Run nwserver-linux
+    shell: cd /nwserver/bin/linux-x86; ./nwserver-linux -module "{{ NW_MODULE_NAME | escape }}" -servername "{{ NW_SERVER_NAME | escape }}" -maxclients "{{ NW_MAX_CLIENTS }}" -minlevel "{{ NW_MIN_LEVEL }}" -maxlevel "{{ NW_MAX_LEVEL }}" -pauseandplay "{{ NW_PAUSE_ALLOWED }}" -pvp "{{ NW_PVP }}" -servervault "{{ NW_SERVER_VAULT }}" -elc "{{ NW_ENFORCE_LEGAL_CHARS }}" -ilr "{{ NW_ENFORCE_ILVL_RESTRICTIONS }}" -gametype "{{ NW_GAME_TYPE }}" -oneparty "{{ NW_ONE_PARTY }}" -difficulty "{{ NW_DIFFICULTY_LEVEL }}" -dmpassword "{{ NW_DM_PW }}" -adminpassword "{{ NW_ADMIN_PW }}" -publicserver "{{ NW_PUBLIC_SERVER }}" -reloadwhenempty "{{ NW_RELOAD_WHEN_EMPTY }}" -port "{{ NW_PORT }}" </nwserver/stdin &>/nwserver/stdin &
+    ignore_errors: true
+    become: yes
+    become_user: nwserver-user
+    when:
+      - nwserver_binary_exists.stat.exists == true
+      - live_module_exists.stat.exists == true
+      - nwserver_pid.stdout is not search('^[0-9]+$')
