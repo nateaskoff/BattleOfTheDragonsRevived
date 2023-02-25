@@ -57,7 +57,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -70,7 +70,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Infracost and Terragrunt plan
         working-directory: infra
@@ -113,7 +113,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ env.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -126,7 +126,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
@@ -156,7 +156,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://dev-botdr-s3-code-bucket/Ansible/ --recursive
@@ -198,7 +198,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ secrets.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -211,7 +211,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Infracost and Terragrunt plan
         working-directory: infra
@@ -254,7 +254,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ secrets.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -267,7 +267,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
@@ -297,7 +297,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://prod-botdr-s3-code-bucket/Ansible/ --recursive
@@ -337,7 +337,7 @@ jobs:
         run: |
           cat <<EOF >> ~/.terraformrc
           credentials "app.terraform.io" {
-              token = "${ secrets.TF_TOKEN }"
+              token = "${{ secrets.TF_TOKEN }}"
           }
           EOF
       - name: Configure AWS credentials
@@ -350,7 +350,7 @@ jobs:
           EOF
           cat <<EOF >> ~/.aws/config
           [default]
-          region=${AWS_REGION}
+          region=${{ vars.AWS_REGION }}
           EOF
       - name: Run Terragrunt Apply
         working-directory: infra
