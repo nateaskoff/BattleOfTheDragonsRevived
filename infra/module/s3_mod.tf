@@ -76,7 +76,7 @@ data "aws_iam_policy_document" "app_s3_mod_s3_iam_policy_document" {
     principals {
       type = "AWS"
       identifiers = [
-        "*"
+        aws_iam_role.app_ec2_iam_role.arn
       ]
     }
     actions = [
@@ -87,13 +87,6 @@ data "aws_iam_policy_document" "app_s3_mod_s3_iam_policy_document" {
       aws_s3_bucket.app_s3_mod_bucket.arn,
       "${aws_s3_bucket.app_s3_mod_bucket.arn}/*"
     ]
-    condition {
-      test     = "ArnLike"
-      variable = "aws:PrincipalTag/aws:RoleName"
-      values = [
-        "*-ec2-iam-role"
-      ]
-    }
   }
 }
 
