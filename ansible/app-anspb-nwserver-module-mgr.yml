@@ -36,7 +36,3 @@
     set_fact:
       nwserver_service: "{{ nwserver_service.stdout }}"
     when: nwserver_service.rc == 0
-
-#  - name: Notify module of restart
-#    command: ""
-#    when: nw_module.changed

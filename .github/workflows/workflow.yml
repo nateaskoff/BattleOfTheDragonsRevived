@@ -23,6 +23,7 @@ env:
 
 jobs:
   job-dev-test:
+    if: github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     runs-on: ubuntu-latest
     environment: DEV
     env:
@@ -88,7 +89,7 @@ jobs:
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-dev-test
-    if: needs.job-dev-test.result == 'success'
+    if: needs.job-dev-test.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -144,7 +145,7 @@ jobs:
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-dev-deploy
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -202,7 +203,7 @@ jobs:
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-prod-test
-    if: needs.job-prod-test.result == 'success'
+    if: needs.job-prod-test.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -257,7 +258,7 @@ jobs:
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
     needs: job-prod-deploy
-    if: needs.job-prod-deploy.result == 'success'
+    if: needs.job-prod-deploy.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
