@@ -250,6 +250,7 @@ jobs:
 
   job-dev-teardown:
     runs-on: ubuntu-latest
+    environment: DEV
     env:
       AWS_ENV: DEV
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
