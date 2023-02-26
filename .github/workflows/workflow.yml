@@ -22,7 +22,8 @@ env:
   NW_ADMIN_PW: ${{ secrets.NW_ADMIN_PW }}
 
 jobs:
-  job-dev-tf-plan:
+  job-dev-test:
+    if: github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     runs-on: ubuntu-latest
     environment: DEV
     env:
@@ -78,7 +79,7 @@ jobs:
           infracost breakdown --path .
           terragrunt plan
 
-  job-dev-tf-apply:
+  job-dev-deploy:
     runs-on: ubuntu-latest
     environment: DEV
     env:
@@ -87,15 +88,15 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
-    needs: job-dev-tf-plan
-    if: needs.job-dev-tf-plan.result == 'success'
+    needs: job-dev-test
+    if: needs.job-dev-test.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install curl wget zip unzip -y
+          sudo apt-get install curl wget zip unzip awscli -y
       - name: Install Terraform
         run: |
           wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
@@ -131,37 +132,10 @@ jobs:
       - name: Run Terragrunt Apply
         working-directory: infra
         run: terragrunt apply --auto-approve
-
-  job-dev-code-deploy:
-    runs-on: ubuntu-latest
-    environment: DEV
-    needs: job-dev-tf-apply
-    env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
-    if: needs.job-dev-tf-apply.result == 'success'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Install Dependencies
-        run: |
-          export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install awscli -y
-      - name: Configure AWS credentials
-        run: |
-          mkdir ~/.aws
-          cat <<EOF >> ~/.aws/credentials
-          [default]
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          EOF
-          cat <<EOF >> ~/.aws/config
-          [default]
-          region=${{ vars.AWS_REGION }}
-          EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://dev-botdr-s3-code-bucket/Ansible/ --recursive
 
-  job-prod-tf-plan:
+  job-prod-test:
     runs-on: ubuntu-latest
     environment: PROD
     env:
@@ -170,8 +144,8 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
-    needs: job-dev-code-deploy
-    if: github.ref == 'refs/heads/main'
+    needs: job-dev-deploy
+    if: github.ref == 'refs/heads/main' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -219,7 +193,7 @@ jobs:
           infracost breakdown --path .
           terragrunt plan
 
-  job-prod-tf-apply:
+  job-prod-deploy:
     runs-on: ubuntu-latest
     environment: PROD
     env:
@@ -228,15 +202,15 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
-    needs: job-prod-tf-plan
-    if: needs.job-prod-tf-plan.result == 'success'
+    needs: job-prod-test
+    if: needs.job-prod-test.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install curl wget zip unzip -y
+          sudo apt-get install curl wget zip unzip awscli -y
       - name: Install Terraform
         run: |
           wget https://releases.hashicorp.com/terraform/${{ vars.TF_VERSION }}/terraform_${{ vars.TF_VERSION }}_linux_amd64.zip
@@ -272,47 +246,19 @@ jobs:
       - name: Run Terragrunt Apply
         working-directory: infra
         run: terragrunt apply --auto-approve
-
-  job-prod-code-deploy:
-    runs-on: ubuntu-latest
-    environment: PROD
-    needs: job-prod-tf-apply
-    env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
-    if: needs.job-prod-tf-apply.result == 'success'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Install Dependencies
-        run: |
-          export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install awscli -y
-      - name: Configure AWS credentials
-        run: |
-          mkdir ~/.aws
-          cat <<EOF >> ~/.aws/credentials
-          [default]
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          EOF
-          cat <<EOF >> ~/.aws/config
-          [default]
-          region=${{ vars.AWS_REGION }}
-          EOF
       - name: Copy code to s3
         run: aws s3 cp ansible/ s3://prod-botdr-s3-code-bucket/Ansible/ --recursive
 
-  job-dev-tf-destroy:
+  job-dev-teardown:
     runs-on: ubuntu-latest
-    environment: DEV
     env:
       AWS_ENV: DEV
       NW_SERVER_NAME: 'Battle Of The Dragons Revived_TEST'
       AWS_REGION: ${{ vars.AWS_REGION }}
       TF_VERSION: ${{ vars.TF_VERSION }}
       TG_VERSION: ${{ vars.TG_VERSION }}
-    needs: job-prod-code-deploy
-    if: needs.job-prod-code-deploy.result == 'success'
+    needs: job-prod-deploy
+    if: needs.job-prod-deploy.result == 'success' && github.event.head_commit.modified_paths | any(startsWith('infra/'), startsWith('ansible/'))
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
