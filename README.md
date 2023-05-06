@@ -1,5 +1,7 @@
 # BattleOfTheDragonsRevived
 
+**Note: This project is temporarily archived for now. I plan to come back to it in order to find a cheaper hosting solution so I can provide it to the players on a permanent basis.**
+
 ## Welcome all Neverwinter Nights: Enhanced Edition PvP enthusiasts!
 
 When I was growing up, I loved logging into Neverwinter Nights and playing on the **Battle of the Dragons** MOBA server. Of course, at the time, I'm not sure we knew what a 'MOBA' really was, but we sure had fun hacking limbs, slinging spells, and sneaking up for a kill!
