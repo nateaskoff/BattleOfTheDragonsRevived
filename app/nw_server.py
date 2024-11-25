@@ -113,44 +113,43 @@ def start_new_server(
     logger.info("Starting NWN server with named pipe for input...")
 
     # Start the nwserver process with stdin redirected to the FIFO
-    with open(FIFO_PATH, 'r') as fifo:
-        nwserver_subprocess = [
-            NwserverBinary,
-            "-module", ModuleName,
-            "-servername", "Battle Of The Dragons Revived BETA",
-            "-maxclients", "32",
-            "-minlevel", "1",
-            "-maxlevel", "20",
-            "-pauseandplay", "0",
-            "-pvp", "1",
-            "-servervault", "0",
-            "-elc", "1",
-            "-ilr", "1",
-            "-gametype", "0",
-            "-oneparty", "0",
-            "-difficulty", "3",
-            "-publicserver", "1",
-            "-reloadwhenempty", "0",
-            "-port", "5121"
-        ]
+    nwserver_subprocess = [
+        NwserverBinary,
+        "-module", ModuleName,
+        "-servername", "Battle Of The Dragons Revived BETA",
+        "-maxclients", "32",
+        "-minlevel", "1",
+        "-maxlevel", "20",
+        "-pauseandplay", "0",
+        "-pvp", "1",
+        "-servervault", "0",
+        "-elc", "1",
+        "-ilr", "1",
+        "-gametype", "0",
+        "-oneparty", "0",
+        "-difficulty", "3",
+        "-publicserver", "1",
+        "-reloadwhenempty", "0",
+        "-port", "5121"
+    ]
 
-        if APP_ENV == "dev":
-            nwserver_subprocess.extend(
-                [
-                    "-dmpassword", DmPassword,
-                    "-playerpassword", PlayerPassword,
-                    "-adminpassword", AdminPassword,
-                ]
-            )
-        else:
-            nwserver_subprocess.extend(
-                [
-                    "-dmpassword", DmPassword,
-                    "-adminpassword", AdminPassword,
-                ]
-            )
+    if APP_ENV == "dev":
+        nwserver_subprocess.extend(
+            [
+                "-dmpassword", DmPassword,
+                "-playerpassword", PlayerPassword,
+                "-adminpassword", AdminPassword,
+            ]
+        )
+    else:
+        nwserver_subprocess.extend(
+            [
+                "-dmpassword", DmPassword,
+                "-adminpassword", AdminPassword,
+            ]
+        )
 
-        subprocess.run(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR, stdin=fifo)
+    subprocess.run(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR)
 
 if __name__ == "__main__":
     # Create the named pipe
