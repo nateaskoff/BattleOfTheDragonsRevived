@@ -108,6 +108,7 @@ jobs:
       TF_VAR_github_sha: ${{ github.sha }}
       TF_VAR_botdr_dm_password: ${{ secrets.BOTDR_DM_PASSWORD }}
       TF_VAR_botdr_player_password: ${{ secrets.BOTDR_PLAYER_PASSWORD }}
+      TF_VAR_botdr_admin_password: ${{ secrets.BOTDR_ADMIN_PASSWORD }}
       TF_STATE_BUCKET_NAME: "eutectic-studio-tf-state"
       TF_STATE_BUCKET_REGION: "us-east-1"
       TF_STATE_BUCKET_KEY: "dev/botdr/terraform.tfstate"
