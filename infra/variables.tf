@@ -24,3 +24,9 @@ variable "botdr_player_password" {
   description = "The password for player access to the BOTDR module in DEV"
   sensitive   = true
 }
+
+variable "botdr_admin_password" {
+  type        = string
+  description = "The password for admin access to the BOTDR module"
+  sensitive   = true
+}

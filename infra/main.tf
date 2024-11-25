@@ -22,4 +22,5 @@ module "botdr" {
   github_sha            = var.github_sha
   botdr_dm_password     = var.botdr_dm_password
   botdr_player_password = var.botdr_player_password
+  botdr_admin_password  = var.botdr_admin_password
 }
