@@ -165,7 +165,8 @@ data "aws_iam_policy_document" "ecs_task_policy" {
     ]
 
     resources = [
-      aws_secretsmanager_secret.botdr_dm_password.arn
+      aws_secretsmanager_secret.botdr_dm_password.arn,
+      aws_secretsmanager_secret.botdr_admin_password.arn
     ]
   }
 
