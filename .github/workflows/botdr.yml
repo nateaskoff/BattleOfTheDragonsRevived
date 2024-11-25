@@ -93,11 +93,11 @@ jobs:
           docker build -t ${{ env.AWS_ECR_REPO }}:${{ github.sha }} .
           docker tag ${{ env.AWS_ECR_REPO }}:${{ github.sha }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         working-directory: "./app"
-      #- name: Push Docker Image
-      #  run: |
-      #    docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-      #    docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
-      #  if: github.ref == 'refs/heads/main'
+      - name: Push Docker Image
+        run: |
+          docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
+        if: github.ref == 'refs/heads/main'
 
   terraform-plan:
     runs-on: ubuntu-latest
@@ -204,8 +204,8 @@ jobs:
         working-directory: "./infra"
       - name: Install boto3
         run: python3 -m pip install boto3
-      #- name: Run BOTDR Deploy Warning Script
-      #  run: python3 ./.devops/ci_cd/scripts/botdr_deploy_ecs_exec.py
+      - name: Run BOTDR Deploy Warning Script
+        run: python3 ./.devops/ci_cd/scripts/botdr_deploy_ecs_exec.py
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: "./infra"
