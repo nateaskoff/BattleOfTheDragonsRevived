@@ -44,6 +44,10 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
           value = aws_s3_bucket.mod_bucket.id
         },
         {
+          name = "BOTDR_ADMIN_PASSWORD_SECRET_ARN",
+          value = aws_secretsmanager_secret.botdr_admin_password.arn
+        },
+        {
           name  = "BOTDR_DM_PASSWORD_SECRET_ARN",
           value = aws_secretsmanager_secret.botdr_dm_password.arn
         },

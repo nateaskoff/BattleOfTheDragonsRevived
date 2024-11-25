@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 APP_ENV = os.getenv("APP_ENV", "dev")
 S3_BUCKET = os.getenv("AWS_S3_MOD_BUCKET_ID")
+BOTDR_ADMIN_PASSWORD_SECRET_ARN = os.getenv("BOTDR_ADMIN_PASSWORD_SECRET_ARN")
 BOTDR_DM_PASSWORD_SECRET_ARN = os.getenv("BOTDR_DM_PASSWORD_SECRET_ARN")
 if APP_ENV == "dev":
     BOTDR_PLAYER_PASSWORD_SECRET_ARN = os.getenv("BOTDR_PLAYER_PASSWORD_SECRET_ARN")
@@ -27,6 +28,8 @@ sec_mgr_client = boto3.client("secretsmanager")
 
 # Retrieve secrets
 logger.info("Retrieving secrets...")
+admin_password_secret = sec_mgr_client.get_secret_value(SecretId=BOTDR_ADMIN_PASSWORD_SECRET_ARN)
+BOTDR_ADMIN_PASSWORD = admin_password_secret["SecretString"]
 dm_password_secret = sec_mgr_client.get_secret_value(SecretId=BOTDR_DM_PASSWORD_SECRET_ARN)
 BOTDR_DM_PASSWORD = dm_password_secret["SecretString"]
 if APP_ENV == "dev":
@@ -93,6 +96,7 @@ def start_new_server(
     ModuleName: str,
     NwserverBinary: str,
     ModLocation: str,
+    AdminPassword: str,
     DmPassword: str,
     PlayerPassword: str
     ) -> None:
@@ -135,17 +139,18 @@ def start_new_server(
                 [
                     "-dmpassword", DmPassword,
                     "-playerpassword", PlayerPassword,
-                    "-adminpassword", DmPassword,
+                    "-adminpassword", AdminPassword,
                 ]
             )
         else:
             nwserver_subprocess.extend(
                 [
-                    "-dmpassword", DmPassword
+                    "-dmpassword", DmPassword,
+                    "-adminpassword", AdminPassword,
                 ]
             )
 
-        subprocess.Popen(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR, stdin=fifo)
+        subprocess.run(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR, stdin=fifo)
 
 if __name__ == "__main__":
     # Create the named pipe
@@ -166,6 +171,7 @@ if __name__ == "__main__":
         ModuleName=MODULE_NAME,
         NwserverBinary=NWSERVER_BINARY,
         ModLocation=DEFAULT_MOD_LOCATION,
+        AdminPassword=BOTDR_ADMIN_PASSWORD,
         DmPassword=BOTDR_DM_PASSWORD,
         PlayerPassword=BOTDR_PLAYER_PASSWORD
     )
