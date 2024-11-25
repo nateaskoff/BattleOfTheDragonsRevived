@@ -1,0 +1,211 @@
+name: Battle of the Dragons Revived
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  node_version: "20.x"
+  python_version: "3.12"
+  terraform_version: "1.9.8"
+
+jobs:
+  security-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.python_version }}
+      - name: Set Up Checkov
+        run: pip install checkov
+      - name: Run Checkov
+        run: checkov --quiet
+
+  cost-estimation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Up Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_TOKEN }}
+      - name: Run Infracost
+        run: infracost breakdown --path ./infra
+
+  build-and-test-yarn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+      - name: Install Yarn
+        run: npm install -g yarn
+      - name: Build Env Bundle
+        run: yarn install
+        working-directory: "./web"
+      - name: Run Unit Tests
+        run: yarn test --detectOpenHandles
+        working-directory: "./web"
+      - name: Run Yarn Build
+        run: yarn build
+        working-directory: "./web"
+
+  build-push-docker-app:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ENV: "dev"
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: "us-east-1"
+      AWS_ECR_REPO: "dev-botdr-ecr-repo"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Up Docker
+        uses: docker/setup-buildx-action@v3
+      - name: Setup OIDC AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: GitHubActions-botdr-${{ github.sha }}
+          aws-region: us-east-1
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.AWS_ECR_REPO }}:${{ github.sha }} .
+          docker tag ${{ env.AWS_ECR_REPO }}:${{ github.sha }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
+        working-directory: "./app"
+      - name: Push Docker Image
+        run: |
+          docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
+        if: github.ref == 'refs/heads/main'
+
+  terraform-plan:
+    runs-on: ubuntu-latest
+    env:
+      TF_WORKSPACE: "dev-botdr"
+      TF_VAR_env: "dev"
+      TF_VAR_vpc_id: "1"
+      TF_VAR_github_sha: ${{ github.sha }}
+      TF_VAR_botdr_dm_password: ${{ secrets.BOTDR_DM_PASSWORD }}
+      TF_VAR_botdr_player_password: ${{ secrets.BOTDR_PLAYER_PASSWORD }}
+      TF_STATE_BUCKET_NAME: "eutectic-studio-tf-state"
+      TF_STATE_BUCKET_REGION: "us-east-1"
+      TF_STATE_BUCKET_KEY: "dev/botdr/terraform.tfstate"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup OIDC AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: GitHubActions-botdr-${{ github.sha }}
+          aws-region: us-east-1
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.terraform_version }}
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ env.TF_STATE_BUCKET_NAME }}" \
+            -backend-config="region=${{ env.TF_STATE_BUCKET_REGION }}" \
+            -backend-config="key=${{ env.TF_STATE_BUCKET_KEY }}"
+        working-directory: "./infra"
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: "./infra"
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: "./infra"
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - security-analysis
+      - cost-estimation
+      - build-and-test-yarn
+      - terraform-plan
+      - build-push-docker-app
+    concurrency:
+      group: dev-botdr
+    environment:
+      name: DEV
+    env:
+      TF_WORKSPACE: "dev-botdr"
+      TF_VAR_env: "dev"
+      TF_VAR_vpc_id: "1"
+      TF_VAR_github_sha: ${{ github.sha }}
+      TF_VAR_botdr_dm_password: ${{ secrets.BOTDR_DM_PASSWORD }}
+      TF_VAR_botdr_player_password: ${{ secrets.BOTDR_PLAYER_PASSWORD }}
+      TF_STATE_BUCKET_NAME: "eutectic-studio-tf-state"
+      TF_STATE_BUCKET_REGION: "us-east-1"
+      TF_STATE_BUCKET_KEY: "dev/botdr/terraform.tfstate"
+      AWS_S3_CF_BUCKET_ID: "dev-botdr-primary-site-web-bucket"
+      AWS_S3_MOD_BUCKET_ID: "dev-botdr-mod-bucket"
+      AWS_REGION: "us-east-1"
+      AWS_ECS_CLUSTER: "dev-botdr-ecs-cluster"
+      AWS_ECS_SERVICE: "dev-botdr-ecs-service"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup OIDC AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: GitHubActions-botdr-${{ github.sha }}
+          aws-region: us-east-1
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.python_version }}
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+      - name: Install Yarn
+        run: npm install -g yarn
+      - name: Build Env Bundle
+        run: yarn install
+        working-directory: "./web"
+      - name: Run Yarn Build
+        run: yarn build
+        working-directory: "./web"
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.terraform_version }}
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ env.TF_STATE_BUCKET_NAME }}" \
+            -backend-config="region=${{ env.TF_STATE_BUCKET_REGION }}" \
+            -backend-config="key=${{ env.TF_STATE_BUCKET_KEY }}"
+        working-directory: "./infra"
+      - name: Install boto3
+        run: python3 -m pip install boto3
+      - name: Run BOTDR Deploy Warning Script
+        run: python3 ./.devops/ci_cd/scripts/botdr_deploy_ecs_exec.py
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: "./infra"
