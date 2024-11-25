@@ -20,14 +20,14 @@ resource "aws_kms_key" "botdr_key" {
 }
 
 resource "aws_kms_alias" "botdr_key_alias" {
-  name          = "alias/${var.env}-botdr-key"
+  name          = "alias/${var.env}-botdr-kms-key"
   target_key_id = aws_kms_key.botdr_key.id
 }
 
 resource "aws_kms_key_policy" "botdr_key_policy" {
   key_id = aws_kms_key.botdr_key.id
   policy = jsonencode({
-    Id      = "${lower(var.env)}-botdr-key-policy"
+    Id      = "${lower(var.env)}-botdr-kms-key-policy"
     Version = "2012-10-17"
     Statement = [
       {
