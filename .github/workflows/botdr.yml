@@ -203,8 +203,8 @@ jobs:
         working-directory: "./infra"
       - name: Install boto3
         run: python3 -m pip install boto3
-      - name: Run BOTDR Deploy Warning Script
-        run: python3 ./.devops/ci_cd/scripts/botdr_deploy_ecs_exec.py
+      #- name: Run BOTDR Deploy Warning Script
+      #  run: python3 ./.devops/ci_cd/scripts/botdr_deploy_ecs_exec.py
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: "./infra"
