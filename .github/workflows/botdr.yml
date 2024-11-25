@@ -102,7 +102,6 @@ jobs:
   terraform-plan:
     runs-on: ubuntu-latest
     env:
-      TF_WORKSPACE: "dev-botdr"
       TF_VAR_env: "dev"
       TF_VAR_vpc_id: "1"
       TF_VAR_github_sha: ${{ github.sha }}
@@ -153,7 +152,6 @@ jobs:
     environment:
       name: DEV
     env:
-      TF_WORKSPACE: "dev-botdr"
       TF_VAR_env: "dev"
       TF_VAR_vpc_id: "1"
       TF_VAR_github_sha: ${{ github.sha }}
