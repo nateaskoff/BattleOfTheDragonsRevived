@@ -30,7 +30,7 @@ RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedi
     chown -R nwserver-user:nwserver-user /nwserver
 
 # Download NWNXEE and extract it
-RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/latest/nwnxee-linux.zip && \
+RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/latest/NWNX-EE.zip && \
     unzip /tmp/nwnxee.zip -d ${NWNX_DIR} && \
     rm /tmp/nwnxee.zip && \
     chown -R nwserver-user:nwserver-user ${NWNX_DIR}
