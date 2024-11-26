@@ -1,4 +1,4 @@
-# Use ubuntu image
+# Use a base image
 FROM ubuntu:22.04
 
 # Install dependencies and clean up cache
@@ -35,10 +35,6 @@ RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/
     rm /tmp/nwnxee.zip && \
     chown -R nwserver-user:nwserver-user ${NWNX_DIR}
 
-# Copy the nwnx.ini file
-COPY nwnx.ini ${NWNX_DIR}/nwnx.ini
-RUN chown nwserver-user:nwserver-user ${NWNX_DIR}/nwnx.ini
-
 # Copy the server script into the user's home directory
 COPY nw_server.py ${HOME}/nw_server.py
 RUN chmod 755 ${HOME}/nw_server.py && \
@@ -49,6 +45,9 @@ COPY botdr_deploy_notification.sh ${HOME}/botdr_deploy_notification.sh
 RUN chmod 755 ${HOME}/botdr_deploy_notification.sh && \
     chown nwserver-user:nwserver-user ${HOME}/botdr_deploy_notification.sh && \
     chmod +x ${HOME}/botdr_deploy_notification.sh
+
+# Copy the nwnx.ini config into the correct directory
+COPY nwnx.ini ${NWNX_DIR}/nwnx.ini
 
 # Set the working directory
 WORKDIR ${HOME}
