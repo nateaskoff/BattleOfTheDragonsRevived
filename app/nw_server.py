@@ -151,7 +151,7 @@ def send_system_message(message: str):
     """
     try:
         response = requests.post(
-            "http://localhost:YOUR_NWNX_PORT/nwnx/chat/send_message",
+            "http://localhost:8181/nwnx/chat/send_message",
             json={"message": message}
         )
         if response.status_code == 200:

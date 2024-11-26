@@ -1,4 +1,4 @@
-# Use a base image
+# Use ubuntu image
 FROM ubuntu:22.04
 
 # Install dependencies and clean up cache
@@ -34,6 +34,10 @@ RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/
     unzip /tmp/nwnxee.zip -d ${NWNX_DIR} && \
     rm /tmp/nwnxee.zip && \
     chown -R nwserver-user:nwserver-user ${NWNX_DIR}
+
+# Copy the nwnx.ini file
+COPY nwnx.ini ${NWNX_DIR}/nwnx.ini
+RUN chown nwserver-user:nwserver-user ${NWNX_DIR}/nwnx.ini
 
 # Copy the server script into the user's home directory
 COPY nw_server.py ${HOME}/nw_server.py
