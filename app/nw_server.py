@@ -3,6 +3,7 @@ import os
 import logging
 import boto3
 from botocore.exceptions import ClientError
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -16,10 +17,10 @@ BOTDR_DM_PASSWORD_SECRET_ARN = os.getenv("BOTDR_DM_PASSWORD_SECRET_ARN")
 if APP_ENV == "dev":
     BOTDR_PLAYER_PASSWORD_SECRET_ARN = os.getenv("BOTDR_PLAYER_PASSWORD_SECRET_ARN")
 MODULE_NAME = "Battle_Of_The_Dragons_Revived"
-DEFAULT_MOD_LOCATION = os.path.expanduser("~/.local/share/Neverwinter Nights.0/modules")
+DEFAULT_MOD_LOCATION = os.path.expanduser("~/.local/share/Neverwinter Nights/modules")
 NWSERVER_BINARY_DIR = "/nwserver/bin/linux-x86"
 NWSERVER_BINARY = os.path.join(NWSERVER_BINARY_DIR, "nwserver-linux")
-FIFO_PATH = "/tmp/nwserver_fifo"
+NWNXEE_BINARY = os.path.join(NWSERVER_BINARY_DIR, "NWNX_Linux")
 
 # S3 client setup
 logger.info("Setting up AWS clients...")
@@ -40,23 +41,14 @@ else:
 
 logger.info("Begin NWN server startup process...")
 
-def create_named_pipe():
-    """
-    Creates a named pipe (FIFO) if it doesn't exist.
-    """
-    if not os.path.exists(FIFO_PATH):
-        logger.info("Creating named pipe...")
-        os.mkfifo(FIFO_PATH)
-        logger.info(f"Named pipe created at {FIFO_PATH}")
-
 def init_nwserver():
     """
-    Runs the nwserver binary to generate all required files
+    Runs the nwserver binary to generate all required files.
     """
     logger.info("Initializing NWN server...")
     subprocess.run([NWSERVER_BINARY, "-d"], cwd=NWSERVER_BINARY_DIR)
 
-def download_mod_from_s3( S3Bucket: str, S3Key: str, DestinationDir: str) -> None:
+def download_mod_from_s3(S3Bucket: str, S3Key: str, DestinationDir: str) -> None:
     """
     Downloads a module file from an S3 bucket and sets appropriate permissions.
 
@@ -73,7 +65,6 @@ def download_mod_from_s3( S3Bucket: str, S3Key: str, DestinationDir: str) -> Non
 
         logger.info("Setting mod file permissions...")
         os.chmod(destination_path, 0o775)
-        os.system(f"chmod +x \"{destination_path}\"")
         logger.info("Mod file permissions set successfully")
     except ClientError as e:
         logger.error("Error downloading mod from S3: %s", e)
@@ -95,13 +86,14 @@ def verify_path_exists(Path: str, Description: str) -> bool:
 def start_new_server(
     ModuleName: str,
     NwserverBinary: str,
+    NwnxeeBinary: str,
     ModLocation: str,
     AdminPassword: str,
     DmPassword: str,
     PlayerPassword: str
-    ) -> None:
+) -> None:
     """
-    Starts the NWN server with the specified module, redirecting stdin to the FIFO.
+    Starts the NWN server with NWNX, using the specified module.
     """
     if not verify_path_exists(NwserverBinary, "NWN Server Binary"):
         return
@@ -110,11 +102,12 @@ def start_new_server(
     if not verify_path_exists(module_path, "NWN Module"):
         return
 
-    logger.info("Starting NWN server with named pipe for input...")
+    logger.info("Starting NWN server with NWNX...")
 
-    # Start the nwserver process with stdin redirected to the FIFO
+    # Launch the NWN server with NWNX
     nwserver_subprocess = [
-        NwserverBinary,
+        NwnxeeBinary,    # Launch NWNXEE
+        NwserverBinary,  # NWN server binary
         "-module", ModuleName,
         "-servername", "Battle Of The Dragons Revived BETA",
         "-maxclients", "32",
@@ -149,12 +142,26 @@ def start_new_server(
             ]
         )
 
+    # Run the server with NWNX
     subprocess.run(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR)
 
-if __name__ == "__main__":
-    # Create the named pipe
-    create_named_pipe()
+def send_system_message(message: str):
+    """
+    Sends a system message to the NWN server using NWNX.
+    """
+    try:
+        response = requests.post(
+            "http://localhost:YOUR_NWNX_PORT/nwnx/chat/send_message",
+            json={"message": message}
+        )
+        if response.status_code == 200:
+            logger.info("System message sent successfully.")
+        else:
+            logger.error("Failed to send system message. Status: %s", response.status_code)
+    except Exception as e:
+        logger.error("Error while sending system message: %s", str(e))
 
+if __name__ == "__main__":
     # Initialize the NWN server
     init_nwserver()
 
@@ -165,12 +172,16 @@ if __name__ == "__main__":
         DestinationDir=DEFAULT_MOD_LOCATION
     )
 
-    # Start the NWN server with named pipe support
+    # Start the NWN server with NWNX
     start_new_server(
         ModuleName=MODULE_NAME,
         NwserverBinary=NWSERVER_BINARY,
+        NwnxeeBinary=NWNXEE_BINARY,
         ModLocation=DEFAULT_MOD_LOCATION,
         AdminPassword=BOTDR_ADMIN_PASSWORD,
         DmPassword=BOTDR_DM_PASSWORD,
         PlayerPassword=BOTDR_PLAYER_PASSWORD
     )
+
+    # Example: Send a system message after server start
+    send_system_message("Server is up and running!")

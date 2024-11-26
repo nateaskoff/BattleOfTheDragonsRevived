@@ -1,5 +1,4 @@
 # Use a base image
-#checkov:skip=CKV_DOCKER_2:no way to do health check with nwserver
 FROM ubuntu:22.04
 
 # Install dependencies and clean up cache
@@ -10,6 +9,7 @@ RUN apt-get update && apt-get upgrade -y && \
 # Environment variables
 ENV HOME=/home/nwserver-user
 ENV NWN_SERVER_DIR=/nwserver/bin/linux-x86
+ENV NWNX_DIR=/nwserver/nwnxee
 
 # Install Python requirements
 COPY requirements.txt /tmp/requirements.txt
@@ -20,13 +20,20 @@ RUN python3 -m pip install --upgrade pip && \
 RUN useradd nwserver-user -s /bin/bash -m -d ${HOME} && \
     mkdir -p ${HOME}/.local/share/Neverwinter\ Nights/modules/ && \
     mkdir -p ${NWN_SERVER_DIR} && \
-    chown -R nwserver-user:nwserver-user ${HOME} ${NWN_SERVER_DIR}
+    mkdir -p ${NWNX_DIR} && \
+    chown -R nwserver-user:nwserver-user ${HOME} ${NWN_SERVER_DIR} ${NWNX_DIR}
 
 # Download NWN:EE server for Linux and extract it
 RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedicated-8193.34.zip && \
     unzip /tmp/nwserver-linux.zip -d /nwserver && \
     rm /tmp/nwserver-linux.zip && \
     chown -R nwserver-user:nwserver-user /nwserver
+
+# Download NWNXEE and extract it
+RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/latest/nwnxee-linux.zip && \
+    unzip /tmp/nwnxee.zip -d ${NWNX_DIR} && \
+    rm /tmp/nwnxee.zip && \
+    chown -R nwserver-user:nwserver-user ${NWNX_DIR}
 
 # Copy the server script into the user's home directory
 COPY nw_server.py ${HOME}/nw_server.py
