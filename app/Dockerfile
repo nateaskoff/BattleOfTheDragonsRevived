@@ -6,6 +6,6 @@ ARG AWS_REGION
 
 RUN mkdir -p ~/.local/share/Neverwinter\ Nights/modules
 
-RUN cp app/Battle_Of_The_Dragons_Revived.mod ~/.local/share/Neverwinter\ Nights/modules
+RUN cp /tmp/Battle_Of_The_Dragons_Revived.mod ~/.local/share/Neverwinter\ Nights/modules
 
 EXPOSE 5121/udp
