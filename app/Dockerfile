@@ -49,11 +49,6 @@ RUN chmod 755 ${HOME}/botdr_deploy_notification.sh && \
 # Copy the nwnx.ini config into the correct directory
 COPY nwnx.ini ${NWN_SERVER_DIR}/nwnx.ini
 
-# Create a startup script to preload NWNX_Core.so and start the server
-COPY start_server.sh ${HOME}/start_server.sh
-RUN chmod +x ${HOME}/start_server.sh && \
-    chown nwserver-user:nwserver-user ${HOME}/start_server.sh
-
 # Set the working directory
 WORKDIR ${HOME}
 
