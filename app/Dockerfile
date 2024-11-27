@@ -59,4 +59,4 @@ USER nwserver-user
 EXPOSE 5121/udp
 
 # Command to start the server using the startup script
-CMD ["./start_server.sh"]
+CMD ["python3", "nw_server.py"]
