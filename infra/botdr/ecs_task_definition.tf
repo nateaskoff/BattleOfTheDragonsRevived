@@ -34,6 +34,82 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         {
           name  = "ECS_ENABLE_CONTAINER_METADATA"
           value = "true"
+        },
+        {
+          name = "NWN_PORT"
+          value = "5121"
+        },
+        {
+          name = "NWN_MODULE"
+          value = "Battle_Of_The_Dragons_Revived"
+        },
+        {
+          name = "NWN_SERVERNAME"
+          value = "Battle Of The Dragons Revived BETA"
+        },
+        {
+          name = "NWN_PUBLICSERVER"
+          value = "1"
+        },
+        {
+          name = "NWN_MAXCLIENTS"
+          value = "40"
+        },
+        {
+          name = "NWN_MINLEVEL"
+          value = "1"
+        },
+        {
+          name = "NWN_MAXLEVEL"
+          value = "20"
+        },
+        {
+          name = "NWN_PAUSEANDPLAY"
+          value = "0"
+        },
+        {
+          name = "NWN_PVP"
+          value = "1"
+        },
+        {
+          name = "NWN_SERVERVAULT"
+          value = "0"
+        },
+        {
+          name = "NWN_ELC"
+          value = "1"
+        },
+        {
+          name = "NWN_ILR"
+          value = "1"
+        },
+        {
+          name = "NWN_GAMETYPE"
+          value = "0"
+        },
+        {
+          name = "NWN_ONEPARTY"
+          value = "0"
+        },
+        {
+          name = "NWN_DIFFICULTY"
+          value = "4"
+        },
+        {
+          name = "NWN_RELOADWHENEMPTY"
+          value = "0"
+        },
+        {
+          name = "NWN_PLAYERPASSWORD"
+          value = var.env == "dev" ? var.botdr_player_password : ""
+        },
+        {
+          name = "NWN_ADMINPASSWORD"
+          value = var.botdr_admin_password
+        },
+        {
+          name = "NWN_DMPASSWORD"
+          value = var.botdr_dm_password
         }
       ]
     }
