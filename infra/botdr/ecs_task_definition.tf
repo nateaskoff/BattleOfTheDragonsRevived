@@ -54,6 +54,10 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         {
           name  = "BOTDR_PLAYER_PASSWORD_SECRET_ARN",
           value = var.env == "dev" ? aws_secretsmanager_secret.botdr_player_password[0].arn : ""
+        },
+        {
+          name = "LD_PRELOAD"
+          value = "/nwserver/bin/linux-x86/NWNX_Core.so"
         }
       ]
     }
