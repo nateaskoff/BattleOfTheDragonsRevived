@@ -9,7 +9,7 @@ RUN apt-get update && apt-get upgrade -y && \
 # Environment variables
 ENV HOME=/home/nwserver-user
 ENV NWN_SERVER_DIR=/nwserver/bin/linux-x86
-ENV NWNX_DIR=/nwserver/nwnxee
+ENV NWNX_DIR=/nwserver/bin/linux-x86
 
 # Install Python requirements
 COPY requirements.txt /tmp/requirements.txt
@@ -20,8 +20,7 @@ RUN python3 -m pip install --upgrade pip && \
 RUN useradd nwserver-user -s /bin/bash -m -d ${HOME} && \
     mkdir -p ${HOME}/.local/share/Neverwinter\ Nights/modules/ && \
     mkdir -p ${NWN_SERVER_DIR} && \
-    mkdir -p ${NWNX_DIR} && \
-    chown -R nwserver-user:nwserver-user ${HOME} ${NWN_SERVER_DIR} ${NWNX_DIR}
+    chown -R nwserver-user:nwserver-user ${HOME} ${NWN_SERVER_DIR}
 
 # Download NWN:EE server for Linux and extract it
 RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedicated-8193.34.zip && \
@@ -29,11 +28,11 @@ RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedi
     rm /tmp/nwserver-linux.zip && \
     chown -R nwserver-user:nwserver-user /nwserver
 
-# Download NWNXEE and extract it
+# Download NWNXEE and extract it to the same directory as NWN server binaries
 RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/latest/NWNX-EE.zip && \
-    unzip /tmp/nwnxee.zip -d ${NWNX_DIR} && \
+    unzip /tmp/nwnxee.zip -d ${NWN_SERVER_DIR} && \
     rm /tmp/nwnxee.zip && \
-    chown -R nwserver-user:nwserver-user ${NWNX_DIR}
+    chown -R nwserver-user:nwserver-user ${NWN_SERVER_DIR}
 
 # Copy the server script into the user's home directory
 COPY nw_server.py ${HOME}/nw_server.py
@@ -47,7 +46,7 @@ RUN chmod 755 ${HOME}/botdr_deploy_notification.sh && \
     chmod +x ${HOME}/botdr_deploy_notification.sh
 
 # Copy the nwnx.ini config into the correct directory
-COPY nwnx.ini ${NWNX_DIR}/nwnx.ini
+COPY nwnx.ini ${NWN_SERVER_DIR}/nwnx.ini
 
 # Set the working directory
 WORKDIR ${HOME}
