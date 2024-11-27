@@ -11,9 +11,6 @@ ENV AWS_ENV=${AWS_ENV}
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip3 install awscli
 
-RUN mkdir server
-RUN mkdir server/modules
-
-RUN aws s3 cp s3://${AWS_ENV}-botdr-mod-bucket/Battle_Of_The_Dragons_Revived.mod server/modules/Battle_Of_The_Dragons_Revived.mod
+RUN aws s3 cp s3://${AWS_ENV}-botdr-mod-bucket/Battle_Of_The_Dragons_Revived.mod modules/Battle_Of_The_Dragons_Revived.mod
 
 EXPOSE 5121/udp
