@@ -34,30 +34,6 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         {
           name  = "ECS_ENABLE_CONTAINER_METADATA"
           value = "true"
-        },
-        {
-          name  = "APP_ENV",
-          value = var.env
-        },
-        {
-          name  = "AWS_S3_MOD_BUCKET_ID",
-          value = aws_s3_bucket.mod_bucket.id
-        },
-        {
-          name = "BOTDR_ADMIN_PASSWORD_SECRET_ARN",
-          value = aws_secretsmanager_secret.botdr_admin_password.arn
-        },
-        {
-          name  = "BOTDR_DM_PASSWORD_SECRET_ARN",
-          value = aws_secretsmanager_secret.botdr_dm_password.arn
-        },
-        {
-          name  = "BOTDR_PLAYER_PASSWORD_SECRET_ARN",
-          value = var.env == "dev" ? aws_secretsmanager_secret.botdr_player_password[0].arn : ""
-        },
-        {
-          name = "LD_PRELOAD"
-          value = "/nwserver/bin/linux-x86/NWNX_Core.so"
         }
       ]
     }
