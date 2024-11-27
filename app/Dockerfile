@@ -10,7 +10,7 @@ RUN apt-get update && apt-get upgrade -y && \
 ENV HOME=/home/nwserver-user
 ENV NWN_SERVER_DIR=/nwserver
 ENV NWNX_DIR=/nwserver/bin/linux-x86
-ENV LD_PRELOAD=${NWNX_DIR}/NWNX_Core.so
+#ENV LD_PRELOAD=${NWNX_DIR}/NWNX_Core.so
 
 # Install Python requirements
 COPY requirements.txt /tmp/requirements.txt
