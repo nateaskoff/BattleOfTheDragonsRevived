@@ -268,6 +268,8 @@ jobs:
       AWS_S3_CF_BUCKET_ID: "prod-botdr-primary-site-web-bucket"
       AWS_S3_MOD_BUCKET_ID: "prod-botdr-mod-bucket"
       AWS_REGION: "us-east-1"
+      AWS_ECR_REPO: "prod-botdr-ecr-repo"
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ECS_CLUSTER: "prod-botdr-ecs-cluster"
       AWS_ECS_SERVICE: "prod-botdr-ecs-service"
     steps:
