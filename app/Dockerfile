@@ -16,6 +16,4 @@ RUN mkdir server/modules
 
 RUN aws s3 cp s3://${AWS_ENV}-botdr-mod-bucket/Battle_Of_The_Dragons_Revived.mod server/modules/Battle_Of_The_Dragons_Revived.mod
 
-WORKDIR server
-
 EXPOSE 5121/udp
