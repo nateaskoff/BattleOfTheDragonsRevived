@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         },
         {
           name = "NWN_SERVERNAME"
-          value = "Battle Of The Dragons Revived BETA"
+          value = var.env == "dev" ?  "Battle Of The Dragons Revived BETATEST" : "Battle Of The Dragons Revived"
         },
         {
           name = "NWN_PUBLICSERVER"
