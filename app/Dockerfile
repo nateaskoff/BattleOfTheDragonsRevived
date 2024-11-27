@@ -24,7 +24,7 @@ RUN useradd nwserver-user -s /bin/bash -m -d ${HOME} && \
     chown -R nwserver-user:nwserver-user ${HOME} ${NWN_SERVER_DIR}
 
 # Download and extract NWN:EE server for Linux into its default directory
-RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dicated-8193.34.zip && \
+RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedicated-8193.34.zip && \
     unzip /tmp/nwserver-linux.zip -d /nwserver && \
     rm /tmp/nwserver-linux.zip && \
     chown -R nwserver-user:nwserver-user /nwserver
