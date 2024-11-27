@@ -198,6 +198,11 @@ jobs:
 
   terraform-plan-prod:
     runs-on: ubuntu-latest
+    needs:
+      - security-analysis
+      - cost-estimation
+      - build-and-test-yarn
+      - deploy-dev
     env:
       TF_VAR_env: "prod"
       TF_VAR_vpc_id: "2"
@@ -243,6 +248,7 @@ jobs:
       - cost-estimation
       - build-and-test-yarn
       - terraform-plan-prod
+      - deploy-dev
     concurrency:
       group: prod-botdr
     environment:
