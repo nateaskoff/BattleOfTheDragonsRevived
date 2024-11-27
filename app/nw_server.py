@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 APP_ENV = os.getenv("APP_ENV", "dev")
+AWS_REGION = os.getenv("AWS_REGION")
 S3_BUCKET = os.getenv("AWS_S3_MOD_BUCKET_ID")
 BOTDR_ADMIN_PASSWORD_SECRET_ARN = os.getenv("BOTDR_ADMIN_PASSWORD_SECRET_ARN")
 BOTDR_DM_PASSWORD_SECRET_ARN = os.getenv("BOTDR_DM_PASSWORD_SECRET_ARN")
@@ -20,12 +21,11 @@ MODULE_NAME = "Battle_Of_The_Dragons_Revived"
 DEFAULT_MOD_LOCATION = os.path.expanduser("~/.local/share/Neverwinter Nights/modules")
 NWSERVER_BINARY_DIR = "/nwserver/bin/linux-x86"
 NWSERVER_BINARY = os.path.join(NWSERVER_BINARY_DIR, "nwserver-linux")
-NWNXEE_BINARY = os.path.join(NWSERVER_BINARY_DIR, "NWNX_Linux")
 
 # S3 client setup
 logger.info("Setting up AWS clients...")
-s3_client = boto3.client("s3")
-sec_mgr_client = boto3.client("secretsmanager")
+s3_client = boto3.client("s3", region_name=AWS_REGION)
+sec_mgr_client = boto3.client("secretsmanager", region_name=AWS_REGION)
 
 # Retrieve secrets
 logger.info("Retrieving secrets...")
@@ -86,14 +86,13 @@ def verify_path_exists(Path: str, Description: str) -> bool:
 def start_new_server(
     ModuleName: str,
     NwserverBinary: str,
-    NwnxeeBinary: str,
     ModLocation: str,
     AdminPassword: str,
     DmPassword: str,
     PlayerPassword: str
 ) -> None:
     """
-    Starts the NWN server with NWNX, using the specified module.
+    Starts the NWN server using the specified module.
     """
     if not verify_path_exists(NwserverBinary, "NWN Server Binary"):
         return
@@ -102,11 +101,10 @@ def start_new_server(
     if not verify_path_exists(module_path, "NWN Module"):
         return
 
-    logger.info("Starting NWN server with NWNX...")
+    logger.info("Starting NWN server...")
 
-    # Launch the NWN server with NWNX
+    # Launch the NWN server without NWNX
     nwserver_subprocess = [
-        NwnxeeBinary,    # Launch NWNXEE
         NwserverBinary,  # NWN server binary
         "-module", ModuleName,
         "-servername", "Battle Of The Dragons Revived BETA",
@@ -142,12 +140,12 @@ def start_new_server(
             ]
         )
 
-    # Run the server with NWNX
+    # Run the server without NWNX
     subprocess.run(nwserver_subprocess, cwd=NWSERVER_BINARY_DIR)
 
 def send_system_message(message: str):
     """
-    Sends a system message to the NWN server using NWNX.
+    Sends a system message to the NWN server.
     """
     try:
         response = requests.post(
@@ -172,11 +170,10 @@ if __name__ == "__main__":
         DestinationDir=DEFAULT_MOD_LOCATION
     )
 
-    # Start the NWN server with NWNX
+    # Start the NWN server
     start_new_server(
         ModuleName=MODULE_NAME,
         NwserverBinary=NWSERVER_BINARY,
-        NwnxeeBinary=NWNXEE_BINARY,
         ModLocation=DEFAULT_MOD_LOCATION,
         AdminPassword=BOTDR_ADMIN_PASSWORD,
         DmPassword=BOTDR_DM_PASSWORD,
