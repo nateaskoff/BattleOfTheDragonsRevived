@@ -185,7 +185,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --build-arg AWS_ENV=${{ env.AWS_ENV }} \
+            --build-arg AWS_ENV=${{ env.TF_VAR_env }} \
             --build-arg AWS_REGION=${{ env.AWS_REGION }} \
             --build-arg AWS_ACCESS_KEY_ID=${{ secrets.MOD_S3_AWS_ACCESS_KEY_ID }} \
             --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.MOD_S3_AWS_SECRET_ACCESS_KEY }} \
@@ -319,7 +319,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --build-arg AWS_ENV=${{ env.AWS_ENV }} \
+            --build-arg AWS_ENV=${{ env.TF_VAR_env }} \
             --build-arg AWS_REGION=${{ env.AWS_REGION }} \
             --build-arg AWS_ACCESS_KEY_ID=${{ secrets.MOD_S3_AWS_ACCESS_KEY_ID }} \
             --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.MOD_S3_AWS_SECRET_ACCESS_KEY }} \
