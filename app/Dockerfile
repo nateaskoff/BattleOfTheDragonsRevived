@@ -30,9 +30,13 @@ RUN wget -O /tmp/nwserver-linux.zip https://nwn.beamdog.net/downloads/nwnee-dedi
 
 # Download NWNXEE and extract it to the same directory as NWN server binaries
 RUN wget -O /tmp/nwnxee.zip https://github.com/nwnxee/unified/releases/download/latest/NWNX-EE.zip && \
-    unzip /tmp/nwnxee.zip -d ${NWN_SERVER_DIR} && \
+    unzip /tmp/nwnxee.zip -d /nwserver && \
     rm /tmp/nwnxee.zip && \
-    chown -R nwserver-user:nwserver-user ${NWN_SERVER_DIR}
+    chown -R nwserver-user:nwserver-user /nwserver
+
+# Move NWNX libraries into the server directory (same folder as nwserver-linux)
+RUN mv /nwserver/bin/linux-x86/*.so /nwserver/bin/ && \
+    chown -R nwserver-user:nwserver-user /nwserver/bin/
 
 # Copy the server script into the user's home directory
 COPY nw_server.py ${HOME}/nw_server.py
