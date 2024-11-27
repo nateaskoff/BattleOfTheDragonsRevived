@@ -110,6 +110,10 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         {
           name = "NWN_DMPASSWORD"
           value = var.botdr_dm_password
+        },
+        {
+          name = "NWNX_CHAT_SKIP"
+          value = "n"
         }
       ]
     }
