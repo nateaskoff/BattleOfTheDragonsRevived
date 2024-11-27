@@ -201,7 +201,7 @@ jobs:
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
       - name: Deploy Web Code
-        run: aws s3 sync ./web/build s3://${{ env.AWS_S3_CF_BUCKET_ID }} --delete
+        run: aws s3 sync ./build s3://${{ env.AWS_S3_CF_BUCKET_ID }} --delete
         working-directory: "./web"
         if: github.ref == 'refs/heads/main'
 
@@ -342,6 +342,6 @@ jobs:
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
       - name: Deploy Web Code
-        run: aws s3 sync ./web/build s3://${{ env.AWS_S3_CF_BUCKET_ID }} --delete
+        run: aws s3 sync ./build s3://${{ env.AWS_S3_CF_BUCKET_ID }} --delete
         working-directory: "./web"
         if: github.ref == 'refs/heads/main'
