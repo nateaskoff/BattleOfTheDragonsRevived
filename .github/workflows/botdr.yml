@@ -179,6 +179,7 @@ jobs:
         working-directory: "./infra"
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: "./infra"
       - name: Build Docker Image
         run: |
           docker build \
@@ -194,7 +195,6 @@ jobs:
           docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
-        working-directory: "./infra"
 
   terraform-plan-prod:
     runs-on: ubuntu-latest
@@ -289,12 +289,12 @@ jobs:
         run: npm install -g yarn
       - name: Build Env Bundle
         run: yarn install
+        working-directory: "./web"
       - name: Install awscli
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip3 install awscli
-        working-directory: "./web"
       - name: Run Yarn Build
         run: yarn build
         working-directory: "./web"
@@ -311,6 +311,7 @@ jobs:
         working-directory: "./infra"
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: "./infra"
       - name: Build Docker Image
         run: |
           docker build \
@@ -326,4 +327,3 @@ jobs:
           docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
-        working-directory: "./infra"
