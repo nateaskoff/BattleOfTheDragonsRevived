@@ -11,6 +11,18 @@ ENV AWS_ENV=${AWS_ENV}
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip3 install awscli
 
+# Copy requirements.txt
+COPY ./requirements.txt /nwn/home/requirements.txt
+
+# Install requirements
+RUN pip3 install -r /nwn/home/requirements.txt
+
 RUN aws s3 cp s3://${AWS_ENV}-botdr-mod-bucket/Battle_Of_The_Dragons_Revived.mod /nwn/home/modules/Battle_Of_The_Dragons_Revived.mod
+
+# Set up util scripts directory
+RUN mkdir /nwn/home/util
+
+# Copy player notification script to util directory
+COPY ./player_notification.py /nwn/home/util/player_notification.py
 
 EXPOSE 5121/udp
