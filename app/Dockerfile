@@ -36,8 +36,8 @@ RUN wget -O ${TMP_DIR}/nwnxee.zip https://github.com/nwnxee/unified/releases/dow
     chown -R nwserver-user:nwserver-user ${TMP_DIR}/nwnxee
 
 # Move extracted NWN:EE and NWNXEE files into the correct directories
-RUN mv ${TMP_DIR}/nwserver/* /nwserver/ && \
-    mv ${TMP_DIR}/nwnxee/* /nwserver/bin/ && \
+RUN find ${TMP_DIR}/nwserver -type f -exec mv {} /nwserver/ \; && \
+    find ${TMP_DIR}/nwnxee -type f -exec mv {} /nwserver/bin/ \; && \
     chown -R nwserver-user:nwserver-user /nwserver /nwserver/bin/
 
 # Copy the server script into the user's home directory
