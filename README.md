@@ -28,10 +28,6 @@ I would like to make a special acknowledgement to [Beamdog](https://www.beamdog.
 
 This project is under the Apache license. I only ask that if there is something that you'd like to see done with Battle Of The Dragons Revived, submit a 'Suggestion' issue to have it included in this module rather than trying to run your own. We can work to make this module a great project.
 
-Here's how you can update your README to include the GoFundMe link and instructions on setting up recurring donations:
-
----
-
 # Donations
 
 If you'd like to help keep **Battle Of The Dragons Revived** running, you can now support the project through GoFundMe. I am seeking $30/month to cover hosting costs.
