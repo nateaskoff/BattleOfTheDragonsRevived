@@ -19,7 +19,7 @@ function App() {
 
         <div className="links">
           <a 
-            href="https://discord.gg/YOUR_DISCORD_LINK" 
+            href="https://discord.gg/Zdb5GRzx3v" 
             className="link-button" 
             target="_blank" 
             rel="noopener noreferrer"
@@ -28,7 +28,7 @@ function App() {
           </a>
 
           <a 
-            href="https://github.com/YOUR_GITHUB_REPO" 
+            href="https://github.com/nateaskoff/BattleOfTheDragonsRevived" 
             className="link-button" 
             target="_blank" 
             rel="noopener noreferrer"
