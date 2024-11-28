@@ -22,7 +22,4 @@ RUN aws s3 cp s3://${AWS_ENV}-botdr-mod-bucket/Battle_Of_The_Dragons_Revived.mod
 # Set up util scripts directory
 RUN mkdir /nwn/home/util
 
-# Copy player notification script to util directory
-COPY ./player_notification.py /nwn/home/util/player_notification.py
-
 EXPOSE 5121/udp
