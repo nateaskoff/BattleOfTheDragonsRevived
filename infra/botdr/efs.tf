@@ -13,7 +13,7 @@ resource "aws_efs_file_system" "server_vault_fs" {
 resource "aws_efs_mount_target" "server_vault_fs_mt" {
   file_system_id = aws_efs_file_system.server_vault_fs.id
   subnet_id      = aws_subnet.public_subnet.id
-  security_groups = [aws_security_group.efs_sg.id]
+  security_groups = [aws_security_group.efs_sec_grp.id]
 }
 
 resource "aws_efs_file_system_policy" "server_vault_fs_mt_policy" {
