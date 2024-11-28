@@ -43,83 +43,83 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
           value = "true"
         },
         {
-          name = "NWN_PORT"
+          name  = "NWN_PORT"
           value = "5121"
         },
         {
-          name = "NWN_MODULE"
+          name  = "NWN_MODULE"
           value = "Battle_Of_The_Dragons_Revived"
         },
         {
-          name = "NWN_SERVERNAME"
-          value = var.env == "dev" ?  "Battle Of The Dragons Revived BETATEST" : "Battle Of The Dragons Revived"
+          name  = "NWN_SERVERNAME"
+          value = var.env == "dev" ? "Battle Of The Dragons Revived BETATEST" : "Battle Of The Dragons Revived"
         },
         {
-          name = "NWN_PUBLICSERVER"
+          name  = "NWN_PUBLICSERVER"
           value = "1"
         },
         {
-          name = "NWN_MAXCLIENTS"
+          name  = "NWN_MAXCLIENTS"
           value = "40"
         },
         {
-          name = "NWN_MINLEVEL"
+          name  = "NWN_MINLEVEL"
           value = "1"
         },
         {
-          name = "NWN_MAXLEVEL"
+          name  = "NWN_MAXLEVEL"
           value = "20"
         },
         {
-          name = "NWN_PAUSEANDPLAY"
+          name  = "NWN_PAUSEANDPLAY"
           value = "0"
         },
         {
-          name = "NWN_PVP"
+          name  = "NWN_PVP"
           value = "1"
         },
         {
-          name = "NWN_SERVERVAULT"
+          name  = "NWN_SERVERVAULT"
           value = "1"
         },
         {
-          name = "NWN_ELC"
+          name  = "NWN_ELC"
           value = "1"
         },
         {
-          name = "NWN_ILR"
+          name  = "NWN_ILR"
           value = "1"
         },
         {
-          name = "NWN_GAMETYPE"
+          name  = "NWN_GAMETYPE"
           value = "0"
         },
         {
-          name = "NWN_ONEPARTY"
+          name  = "NWN_ONEPARTY"
           value = "0"
         },
         {
-          name = "NWN_DIFFICULTY"
+          name  = "NWN_DIFFICULTY"
           value = "4"
         },
         {
-          name = "NWN_RELOADWHENEMPTY"
+          name  = "NWN_RELOADWHENEMPTY"
           value = "0"
         },
         {
-          name = "NWN_PLAYERPASSWORD"
+          name  = "NWN_PLAYERPASSWORD"
           value = var.env == "dev" ? var.botdr_player_password : ""
         },
         {
-          name = "NWN_ADMINPASSWORD"
+          name  = "NWN_ADMINPASSWORD"
           value = var.botdr_admin_password
         },
         {
-          name = "NWN_DMPASSWORD"
+          name  = "NWN_DMPASSWORD"
           value = var.botdr_dm_password
         },
         {
-          name = "NWNX_CHAT_SKIP"
+          name  = "NWNX_CHAT_SKIP"
           value = "n"
         }
       ]

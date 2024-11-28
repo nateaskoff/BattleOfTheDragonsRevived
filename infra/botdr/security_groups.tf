@@ -80,6 +80,18 @@ resource "aws_security_group_rule" "tcp_egress_53" {
   ]
 }
 
+resource "aws_security_group_rule" "tcp_ingress_pub_2049" {
+  type              = "ingress"
+  description       = "Allow inbound traffic on port 2049"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ecs_security_group.id
+  cidr_blocks = [
+    aws_subnet.public_subnet.cidr_block
+  ]
+}
+
 resource "aws_security_group" "efs_sec_grp" {
   vpc_id      = aws_vpc.primary_vpc.id
   name        = "${var.env}-botdr-efs-security-group"
