@@ -122,7 +122,7 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
   volume {
     name = "servervault"
     efs_volume_configuration {
-      file_system_id = aws_efs_file_system.efs.id
+      file_system_id = aws_efs_file_system.server_vault_fs.id
       root_directory = "/servervault"
       transit_encryption = "ENABLED"
       transit_encryption_port = 2049
