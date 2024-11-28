@@ -197,3 +197,17 @@ data "aws_iam_policy_document" "ecs_task_role_policy_dev_player_pw" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "efs_policy" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.ecs_task_execution_role.arn]
+    }
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite"
+    ]
+  }
+}

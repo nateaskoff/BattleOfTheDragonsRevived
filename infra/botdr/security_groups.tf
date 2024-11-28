@@ -79,3 +79,33 @@ resource "aws_security_group_rule" "tcp_egress_53" {
     "0.0.0.0/0"
   ]
 }
+
+resource "aws_security_group" "efs_sec_grp" {
+  vpc_id      = aws_vpc.primary_vpc.id
+  name        = "${var.env}-botdr-efs-security-group"
+  description = "Security group for the EFS service for BOTDR in the ${var.env} environment"
+}
+
+resource "aws_security_group_rule" "efs_ingress" {
+  type              = "ingress"
+  description       = "Allow inbound traffic on all ports"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  security_group_id = aws_security_group.efs_sec_grp.id
+  cidr_blocks = [
+    aws_subnet.public_subnet.cidr_block
+  ]
+}
+
+resource "aws_security_group_rule" "efs_egress" {
+  type              = "egress"
+  description       = "Allow outbound traffic on all ports"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  security_group_id = aws_security_group.efs_sec_grp.id
+  cidr_blocks = [
+    aws_subnet.public_subnet.cidr_block
+  ]
+}
