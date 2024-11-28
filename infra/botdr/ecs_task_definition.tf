@@ -21,6 +21,13 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
           protocol      = "udp"
         }
       ]
+      mountPoints = [
+        {
+          sourceVolume  = "servervault"
+          containerPath = "/servervault"
+          readOnly      = false
+        }
+      ]
       readonlyRootFilesystem = false
       logConfiguration = {
         logDriver = "awslogs"
