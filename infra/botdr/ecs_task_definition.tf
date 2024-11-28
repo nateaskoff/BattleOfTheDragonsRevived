@@ -73,7 +73,7 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         },
         {
           name = "NWN_SERVERVAULT"
-          value = "0"
+          value = "1"
         },
         {
           name = "NWN_ELC"
