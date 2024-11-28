@@ -30,3 +30,13 @@ variable "botdr_admin_password" {
   description = "The password for admin access to the BOTDR module"
   sensitive   = true
 }
+
+variable "botdr_ecs_cpu" {
+  type        = number
+  description = "The number of CPU units to allocate to the ECS task"
+}
+
+variable "botdr_ecs_memory" {
+  type        = number
+  description = "The amount of memory to allocate to the ECS task"
+}

@@ -23,4 +23,6 @@ module "botdr" {
   botdr_dm_password     = var.botdr_dm_password
   botdr_player_password = var.botdr_player_password
   botdr_admin_password  = var.botdr_admin_password
+  botdr_ecs_cpu         = var.botdr_ecs_cpu
+  botdr_ecs_memory      = var.botdr_ecs_memory
 }
