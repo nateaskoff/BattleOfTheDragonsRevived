@@ -1,38 +1,72 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #282c34;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.App-header h1 {
+  font-size: 4em;
+  margin-bottom: 20px;
+}
+
+.App-header p {
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.links {
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 20px;
+  margin-top: 30px;
 }
 
-.App-link {
-  color: #61dafb;
+.link-button {
+  text-decoration: none;
+  background-color: #61dafb;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1.2em;
+  color: #282c34;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.link-button:hover {
+  background-color: #21a1f1;
+}
+
+/* Styling for the image container */
+.image-container {
+  margin: 30px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Styling the image */
+.banner-image {
+  max-width: 80%;  /* Adjust this value to control image size */
+  max-height: 200px; /* This keeps the height within a small portion of the screen */
+  object-fit: contain;
 }

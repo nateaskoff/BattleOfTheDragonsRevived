@@ -194,12 +194,15 @@ jobs:
             --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.MOD_S3_AWS_SECRET_ACCESS_KEY }} \
             -t ${{ env.AWS_ECR_REPO }}:${{ github.sha }} .
           docker tag ${{ env.AWS_ECR_REPO }}:${{ github.sha }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
-        working-directory: "./app"
+        working-directory: "./app/ecs"
       - name: Push Docker Image
         run: |
           docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
+      - name: Zip Module Deploy Lambda
+        run: zip -r deploy_lambda.zip .
+        working-directory: "./app/lambda"
       - name: Deploy Web Code
         run: aws s3 sync ./build s3://${{ env.AWS_S3_CF_BUCKET_ID }} --delete
         working-directory: "./web"
@@ -335,7 +338,7 @@ jobs:
             --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.MOD_S3_AWS_SECRET_ACCESS_KEY }} \
             -t ${{ env.AWS_ECR_REPO }}:${{ github.sha }} .
           docker tag ${{ env.AWS_ECR_REPO }}:${{ github.sha }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPO }}:botdr-${{ github.sha }}
-        working-directory: "./app"
+        working-directory: "./app/ecs"
       - name: Push Docker Image
         run: |
           docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
