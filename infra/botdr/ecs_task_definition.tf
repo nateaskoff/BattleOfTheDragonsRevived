@@ -118,9 +118,4 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
       ]
     }
   ])
-
-    volume {
-      name      = "server_vault_volume"
-      host_path = "/mnt/server_vault"
-    }
 }
