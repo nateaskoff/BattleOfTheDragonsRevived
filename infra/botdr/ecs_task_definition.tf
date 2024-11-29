@@ -100,7 +100,7 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
         },
         {
           name  = "NWN_DIFFICULTY"
-          value = "4"
+          value = "3"
         },
         {
           name  = "NWN_RELOADWHENEMPTY"
