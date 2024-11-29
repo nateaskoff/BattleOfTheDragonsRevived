@@ -126,11 +126,11 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
     }
   ])
 
-  volume {
-    name = "servervault"
-    efs_volume_configuration {
-      file_system_id = aws_efs_file_system.server_vault_fs.id
-      root_directory = "/servervault"
-    }
-  }
+  #volume {
+  #  name = "servervault"
+  #  efs_volume_configuration {
+  #    file_system_id = aws_efs_file_system.server_vault_fs.id
+  #    root_directory = "/servervault"
+  #  }
+  #}
 }
